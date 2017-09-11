@@ -1,7 +1,7 @@
 # canvas-grapher
 HTML5 / JavaScript Practice
 
-An early project created to practice JavaScript and HTML. Uses HTML5 canvas to draw a peremetric colored graph. 
+An early project created to practice JavaScript and HTML. Uses HTML5 canvas to draw a parametric colored graph. 
 
 A collection of parametric graphs are stored and used to draw line segmens on the canvas. The lines are drawn by calculating `(x1, y1)` from the parametric equation, incrementing `T`, then calculating `(x2, y2)` and drawing a line between them. The script could be easily modified to handle any type of non-parametric curve. Below is an example of the butterfly curve graph and its equation.
 
