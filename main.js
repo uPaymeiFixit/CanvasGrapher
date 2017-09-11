@@ -1,103 +1,131 @@
 /**
- @author Josh Gibbs (uPaymeiFixit@gmail.com)
-*/
+ * @author Josh Gibbs (uPaymeiFixit@gmail.com)
+ */
 
-//variables
-var x, y, T=0, resolution=0.01, parametric=true;
-var ctx, width, height, scalex, scaley;
-var speed = 50;
+const graphs = [
+	{
+	  description: 'x = cos(t) - cos(80t) * sin(t);    y = sin(t) - sin(80t)',
+	  scalex: 2.9,
+	  scaley: 6,
+    resolution: 0.0005,
+    speed: 50,
+	  x: T => Math.cos(T) - Math.cos(80 * T) * Math.sin(T),
+	  y: T => 2 * Math.sin(T) - Math.sin(80 * T)
+  },
+  {
+    description: 'x = sin(t) * cos(-7t/16) - cos(t)/4 * sin(-7t/16);    y = sin(t) * sin(-7t/16) + cos(t)/4 * cos(-7t/16)',
+    scalex: 2.1,
+    scaley: 2.1,
+    resolution: 0.01,
+    speed: 10,
+    x: T => Math.sin(T) * Math.cos(-7 * T / 16) - 0.25 * Math.cos(T) * Math.sin(-7 * T / 16),
+    y: T => Math.sin(T) * Math.sin(-7 * T / 16) + 0.25 * Math.cos(T) * Math.cos(-7 *T / 16)
+  },
+  {
+    description: 'x = 11cos(t) - 6cos(11t/6);    y = 11sin(t) - 6sin(11t/6)',
+    scalex: 35,
+    scaley: 35,
+    resolution: 0.01,
+    speed: 10,
+    x: T => 11 * Math.cos(T) - 6 * Math.cos(11 / 6 * T),
+    y: T => 11 * Math.sin(T) - 6 * Math.sin(11 / 6 * T)
+  },
+  {
+    description: 'Butterfly Curve',
+    scalex: 8,
+    scaley: 8,
+    resolution: 0.01,
+    speed: 10,
+    x: T => Math.sin(T) * (Math.pow(Math.E, Math.cos(T)) - 2 * Math.cos(4 * T) - Math.sin(T / 12)),
+    y: T => Math.cos(T) * (Math.pow(Math.E, Math.cos(T)) - 2 * Math.cos(4 * T) - Math.sin(T / 12))
+  },
+  {
+    description: 'Hypercycloid',
+    scalex: 42,
+    scaley: 42,
+    resolution: 0.01,
+    speed: 10,
+    x: T => x = 17 * Math.cos(T) + 3 * Math.cos(17 * T / 3),
+    y: T => y = 17 * Math.sin(T) + 3 * Math.sin(17 * T / 3)
+  }
+];
 
-//main
-function formula(){
-	//f1
-	//x = cos(T) - cos(80 * T) * sin(T)
-	//y = 2 * sin(T) - sin(80 * T)
+let graph_index = Math.floor(Math.random() * graphs.length);
+let T = 0;
+let ctx;
 
-	//f2
-	//x = sin(T) * cos(-7*T/16) - 1/4 * cos(T) * sin(-7*T/16)
-	//y = sin(T) * sin(-7*T/16) + 1/4 * cos(T) * cos(-7*T/16)
+// Setup function
+window.onload = () => {
+  ctx = document.getElementsByTagName('canvas')[0].getContext('2d');
 
-	//f3
-	//x = 11 * cos(T) - 6 * cos(11/6 * T)
-	//y = 11 * sin(T) - 6 * sin(11/6 * T)
+  window.onresize = resize;
+  ctx.canvas.ondblclick = ctx.canvas.webkitRequestFullScreen;
+  window.onclick = changeGraph;
 
-	//Butterfly Curve
-	x = sin(T) * (Math.pow(Math.E, cos(T)) - 2 * cos(4 * T) - sin(T / 12))
-	y = cos(T) * (Math.pow(Math.E, cos(T)) - 2 * cos(4 * T) - sin(T / 12))
+  resize();
+  window.requestAnimationFrame(animate);
+}
 
-	//Hypercycloid
-	//x = 17 * cos(T) + 3 * cos(17 * T / 3)
-	//y = 17 * sin(T) + 3 * sin(17 * T / 3)
-};
-function calculate(){
-	for(var i = 0; i<speed; i++){
+function resize () {
+  ctx.canvas.width = window.innerWidth;
+  ctx.canvas.height = window.innerHeight;
+  ctx.font = '16px Arial';
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillText(graphs[graph_index].description, 10, 20);
+}
 
-		var px = width / 2 + x * scalex;
-		var py = height / 2 - y * scaley;
+// Iterates through the color schemes
+function changeGraph () {
+  graph_index = (graph_index + 1) % graphs.length;
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  T = 0;
+  ctx.fillText(graphs[graph_index].description, 10, 20);
+}
 
-		if(parametric){
-			T+=resolution;
-		} else {
-			x+=resolution;
-		}
-		
-		formula();
-		//console.log(x + ', ' + y)
+// Calculate final x and y positions for line
+function animate () {
+  window.requestAnimationFrame(animate);
 
-		var cx = width / 2 + x * scalex;
-		var cy = height / 2 - y * scaley;
+  for (let i = 0; i < graphs[graph_index].speed; i++) {
 
-		draw(px, py, cx, cy);
-	};
-};
-function draw(px, py, cx, cy){
+    // Calculate (x1, y1)
+    let x1 = graphs[graph_index].x(T);
+    let y1 = graphs[graph_index].y(T);
 
-	//ctx.clearRect(0, 0, cx, cy); //clears part of the screen so that there is a trail
+    T += graphs[graph_index].resolution;
 
-	var hue = Math.abs((x * scalex / width) + (y * scaley / height)) + 0.5;
-	ctx.strokeStyle = 'rgba(' + hsvToRgb(hue + 0.5, 1, 1) + ',' + 0.5 + ')';
+    // Calculate (x2, y2)
+    let x2 = graphs[graph_index].x(T);
+    let y2 = graphs[graph_index].y(T);
 
-	ctx.beginPath();
-	ctx.moveTo(px,py);
-	ctx.lineTo(cx,cy);
-	ctx.stroke();
-};
+    // Stretch coordinates to canvas size and then scale graphs
+    x1 *= ctx.canvas.width / graphs[graph_index].scalex;
+    y1 *= -ctx.canvas.height / graphs[graph_index].scaley;
+    x2 *= ctx.canvas.width / graphs[graph_index].scalex;
+    y2 *= -ctx.canvas.height / graphs[graph_index].scaley;
 
-//setup
-function init(){
-	width = window.innerWidth;
-	height = window.innerHeight;
-	ctx.canvas.width = width;
-	ctx.canvas.height = height;
+    // Move coordinates to center of canvas
+    x1 += ctx.canvas.width / 2;
+    y1 += ctx.canvas.height / 2;
+    x2 += ctx.canvas.width / 2;
+    y2 += ctx.canvas.height / 2;
 
-	//f1-2
-	//scalex = width / 2.9;
-	//scaley = height / 6;
+    draw(x1, y1, x2, y2);
+  }
+}
 
-	//f3
-	//scalex = width / 50;
-	//scaley = height / 50;
+// Calculate hue and draw a line from (x1, y1) to (x2, y2)
+function draw (x1, y1, x2, y2) {
+  const hue = Math.abs(x1 / ctx.canvas.width + y1 / ctx.canvas.height) + 0.5;
+  ctx.strokeStyle = `rgba(${hsvToRgb(hue + 0.5, 1, 1)}, 0.25)`;
 
-	//Butterfly Curve
-	scalex = width / 8;
-	scaley = height / 8;
-
-	//Hypercycloid
-	//scalex = width / 50;
-	//scaley = height / 50;
-	
-	formula();
-};
-window.onload = function(){
-	ctx = document.getElementById('canvas').getContext('2d');
-	init();
-	setInterval('calculate()', 1000 / 60);
-};
-window.onresize = init;
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+}
 
 //utilities
-function cos(c){return Math.cos(c)};
-function sin(s){return Math.sin(s)};
 function hsvToRgb(h, s, v){
 	var r, g, b;
 
@@ -107,14 +135,14 @@ function hsvToRgb(h, s, v){
 	var q = v * (1 - f * s);
 	var t = v * (1 - (1 - f) * s);
 
-	switch(i % 6){
+	switch(i % 6) {
         case 0: r = v, g = t, b = p; break;
         case 1: r = q, g = v, b = p; break;
         case 2: r = p, g = v, b = t; break;
         case 3: r = p, g = q, b = v; break;
         case 4: r = t, g = p, b = v; break;
         case 5: r = v, g = p, b = q; break;
-	};
+	}
 
 	return [Math.floor(r * 255), Math.floor(g * 255), Math.floor(b * 255)];
-};
+}
