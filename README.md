@@ -16,4 +16,4 @@ A collection of parametric graphs are stored and used to draw line segmens on th
 
 [Live Demo](https://gibbs.tk/portfolio/canvas-grapher/demo/)
 
-![screenshot](https://user-images.githubusercontent.com/1683528/30244924-cec4dfe0-957d-11e7-9e3d-73a62b9acd97.png)
+![screenshot](https://user-images.githubusercontent.com/1683528/30258124-8d60adf6-966b-11e7-95b9-e6e6ccb41022.png)
