@@ -45,8 +45,17 @@ const graphs = [
     scaley: 42,
     resolution: 0.01,
     speed: 10,
-    x: T => x = 17 * Math.cos(T) + 3 * Math.cos(17 * T / 3),
-    y: T => y = 17 * Math.sin(T) + 3 * Math.sin(17 * T / 3)
+    x: T => 17 * Math.cos(T) + 3 * Math.cos(17 * T / 3),
+    y: T => 17 * Math.sin(T) + 3 * Math.sin(17 * T / 3)
+  },
+  {
+    description: 'x = sin(7πT);    y = cos(5πT)',
+    scalex: 2.5,
+    scaley: 2.5,
+    resolution: 0.001,
+    speed: 10,
+    x: T => Math.sin(7 * Math.PI * T),
+    y: T => Math.cos(5 * Math.PI * T)
   }
 ];
 
